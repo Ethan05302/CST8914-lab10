@@ -5,7 +5,7 @@
  */
 
 'use strict';
-// Define a class MenuButtonActions
+
 class MenuButtonActions {
   constructor(domNode, performMenuAction) {
     this.domNode = domNode;
@@ -17,14 +17,9 @@ class MenuButtonActions {
     this.lastMenuitem = false;
     this.firstChars = [];
 
-// Add event listeners for button interactions
-    this.buttonNode.addEventListener(
-      'keydown',
-      this.onButtonKeydown.bind(this)
-    );
+    this.buttonNode.addEventListener('keydown', this.onButtonKeydown.bind(this));
     this.buttonNode.addEventListener('click', this.onButtonClick.bind(this));
 
-    // Query and iterate over menu items, setting up event listeners
     var nodes = domNode.querySelectorAll('[role="menuitem"]');
 
     for (var i = 0; i < nodes.length; i++) {
@@ -34,34 +29,29 @@ class MenuButtonActions {
       this.firstChars.push(menuitem.textContent.trim()[0].toLowerCase());
 
       menuitem.addEventListener('keydown', this.onMenuitemKeydown.bind(this));
-
       menuitem.addEventListener('click', this.onMenuitemClick.bind(this));
-
-      menuitem.addEventListener(
-        'mouseover',
-        this.onMenuitemMouseover.bind(this)
-      );
+      menuitem.addEventListener('mouseover', this.onMenuitemMouseover.bind(this));
 
       if (!this.firstMenuitem) {
         this.firstMenuitem = menuitem;
       }
       this.lastMenuitem = menuitem;
     }
-// Add focus in and focus out event listeners for handling focus styles
+
     domNode.addEventListener('focusin', this.onFocusin.bind(this));
     domNode.addEventListener('focusout', this.onFocusout.bind(this));
 
-// Add mousedown event listener on window to handle clicks outside the menu
-    window.addEventListener(
-      'mousedown',
-      this.onBackgroundMousedown.bind(this),
-      true
-    );
+    window.addEventListener('mousedown', this.onBackgroundMousedown.bind(this), true);
   }
 
   setFocusToMenuitem(newMenuitem) {
     this.menuitemNodes.forEach(function (item) {
-// TOUFIC'S COMMENT: Placeholder for the roving tabindex logic  ;)
+      if (item === newMenuitem) {
+        item.tabIndex = 0;
+        item.focus();
+      } else {
+        item.tabIndex = -1;
+      }
     });
   }
 
@@ -111,27 +101,21 @@ class MenuButtonActions {
 
     char = char.toLowerCase();
 
-    // Get start index for search based on position of currentItem
     start = this.menuitemNodes.indexOf(currentMenuitem) + 1;
     if (start >= this.menuitemNodes.length) {
       start = 0;
     }
 
-    // Check remaining slots in the menu
     index = this.firstChars.indexOf(char, start);
 
-    // If not found in remaining slots, check from beginning
     if (index === -1) {
       index = this.firstChars.indexOf(char, 0);
     }
 
-    // If match was found...
     if (index > -1) {
       this.setFocusToMenuitem(this.menuitemNodes[index]);
     }
   }
-
-  // Utilities
 
   getIndexFirstChars(startIndex, char) {
     for (var i = startIndex; i < this.firstChars.length; i++) {
@@ -141,8 +125,6 @@ class MenuButtonActions {
     }
     return -1;
   }
-
-  // Popup menu methods
 
   openPopup() {
     this.menuNode.style.display = 'block';
@@ -160,8 +142,6 @@ class MenuButtonActions {
     return this.buttonNode.getAttribute('aria-expanded') === 'true';
   }
 
-  // Menu event handlers
-
   onFocusin() {
     this.domNode.classList.add('focus');
   }
@@ -169,9 +149,6 @@ class MenuButtonActions {
   onFocusout() {
     this.domNode.classList.remove('focus');
   }
-
-//This method is triggered when a keydown event occurs on the menu button.
-
 
   onButtonKeydown(event) {
     var key = event.key,
@@ -222,8 +199,6 @@ class MenuButtonActions {
     event.stopPropagation();
     event.preventDefault();
   }
-
-// This method is triggered when a keydown event occurs on a menu item.
 
   onMenuitemKeydown(event) {
     var tgt = event.currentTarget,
@@ -331,7 +306,6 @@ class MenuButtonActions {
   }
 }
 
-// Initialize menu buttons
 window.addEventListener('load', function () {
   document.getElementById('action_output').value = 'none';
 
